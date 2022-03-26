@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
+
 from posts.models import Group, Post
 
 User = get_user_model()
@@ -89,8 +90,11 @@ class PostsURLTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_page_404(self):
+        """ошибке 404 отработает view-функция
+        и отобразится кастомная страница ошибки"""
         response = self.guest_client.get("/John_Doe_page/")
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertTemplateUsed(response, "core/404.html")
 
     def test_add_comment_redirect_guest_on_login(self):
         """Попытка комментирования переведет анонимного

@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import Client, TestCase
 
-from ..models import Group, Post
+from posts.models import Comment, Group, Post
 
 User = get_user_model()
 
@@ -94,4 +94,55 @@ class GroupModelTest(TestCase):
             with self.subTest(field=field):
                 self.assertEqual(
                     group._meta.get_field(field).help_text, expected_value
+                )
+
+
+class CommentModelTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username="TestAuthor")
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text="Тестовый пост для тестирования тестового комментария",
+        )
+        cls.comment = Comment.objects.create(
+            author=cls.user, text="Тестовый комментарий", post=cls.post
+        )
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="SneakyFox")
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
+    def test_comment_model_have_correct_object_names(self):
+        """Проверяем, что у модели корректно работает __str__."""
+        comment = CommentModelTest.comment
+        expected_object_name = comment.text
+        self.assertEqual(expected_object_name, str(comment))
+
+    def test_verbose_name_for_comment_model(self):
+        """verbose_name в полях совпадает с ожидаемым."""
+        comment = CommentModelTest.comment
+        field_verboses = {
+            "author": "Автор",
+            "text": "Текст комментария",
+        }
+        for field, expected_value in field_verboses.items():
+            with self.subTest(field=field):
+                self.assertEqual(
+                    comment._meta.get_field(field).verbose_name, expected_value
+                )
+
+    def test_help_text_for_comment_model(self):
+        """help_text в полях совпадает с ожидаемым."""
+        comment = CommentModelTest.comment
+        field_help_texts = {
+            "author": "Автор комментария",
+            "text": "Введите текст комментария",
+        }
+        for field, expected_value in field_help_texts.items():
+            with self.subTest(field=field):
+                self.assertEqual(
+                    comment._meta.get_field(field).help_text, expected_value
                 )

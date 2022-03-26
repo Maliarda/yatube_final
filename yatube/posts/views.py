@@ -45,12 +45,10 @@ def group_posts(request, slug):
 def profile(request, username):
     """Страница с профайлом пользователя"""
     author = get_object_or_404(User, username=username)
-    if request.user.is_authenticated and request.user != author:
-        following = Follow.objects.filter(
-            user=request.user, author=author
-        ).exists()
-    else:
-        following = False
+    following = (
+        request.user.is_authenticated
+        and author.following.filter(user=request.user).exists()
+    )
     context = {
         "author": author,
         "following": following,
@@ -132,10 +130,9 @@ def follow_index(request):
 def profile_follow(request, username):
     """Подписаться на автора"""
     user = request.user
-    author = User.objects.get(username=username)
-    is_follower = Follow.objects.filter(user=user, author=author)
-    if user != author and not is_follower.exists():
-        Follow.objects.create(user=user, author=author)
+    author = get_object_or_404(User, username=username)
+    if user != author:
+        Follow.objects.get_or_create(user=user, author=author)
     return redirect(reverse("posts:profile", args=[username]))
 
 

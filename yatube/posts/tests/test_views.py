@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
+
 from posts.forms import PostForm
 from posts.models import Follow, Group, Post
 
@@ -322,15 +323,26 @@ class FollowTests(TestCase):
         )
         self.assertEqual(Follow.objects.all().count(), 0)
 
-    def test_subscription_feed(self):
+    def test_subscription_feed_for_followers(self):
         """Новая запись пользователя появляется в ленте тех,
-        кто на него подписан и не появляется в ленте тех, кто не подписан."""
+        кто на него подписан"""
         Follow.objects.create(
             user=self.user_follower, author=self.user_following
         )
         response = self.client_auth_follower.get("/follow/")
         post_text_0 = response.context["page_obj"][0].text
         self.assertEqual(post_text_0, "Тестовая запись для тестирования ленты")
+        response = self.client_auth_following.get("/follow/")
+        self.assertNotContains(
+            response, "Тестовая запись для тестирования ленты"
+        )
+
+    def test_subscription_feed_for_others(self):
+        """Новая запись пользователя не появляется в ленте тех,
+        кто не подписан."""
+        Follow.objects.create(
+            user=self.user_follower, author=self.user_following
+        )
         response = self.client_auth_following.get("/follow/")
         self.assertNotContains(
             response, "Тестовая запись для тестирования ленты"

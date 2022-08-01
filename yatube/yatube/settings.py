@@ -4,13 +4,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = "822bus0%3jdj90sigj*%tg_$3i$yjos+d*ltbh@&!+ax=e++iq"
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "[::1]",
     "testserver",
+    "www.sneakyfox.pythonanywhere.com",
+    "sneakyfox.pythonanywhere.com",
 ]
 
 INSTALLED_APPS = [
@@ -21,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "debug_toolbar",
     "users.apps.UsersConfig",
     "core.apps.CoreConfig",
     "about.apps.AboutConfig",
@@ -35,6 +38,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "yatube.urls"

@@ -6,6 +6,7 @@
 - группы по интересам
 - комментарии к посту
 - подписка на авторов
+- покрытие тестами
 
 ## Технологии
 - Python3.9
@@ -61,4 +62,9 @@ python manage.py migrate
 
 ```
 python manage.py runserver
+```
+### Тесты
+```
+cd yatube_final/yatube
+pytest или python manage.py test
 ```
